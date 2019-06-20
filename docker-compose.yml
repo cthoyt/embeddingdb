@@ -1,0 +1,28 @@
+# Follow guide at https://realpython.com/blog/python/dockerizing-flask-with-compose-and-machine-from-localhost-to-the-cloud/
+
+version: '3'
+
+services:
+  web:
+    build: .
+    volumes:
+     - .:/app
+    environment:
+      EMBEDDINGDB_CONNECTION: postgresql://user:password@database:5432/db
+      SECRET_KEY: ${SECRET_KEY}
+      SECURITY_PASSWORD_SALT: ${SECURITY_PASSWORD_SALT}
+    restart: always
+    command: gunicorn -b 0.0.0.0:5000 embeddingdb.web.wsgi:app --log-level=INFO
+    ports:
+      - 80:5000
+    depends_on:
+     - database
+
+  database:
+    image: postgres:11.1
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: db
+    ports:
+      - 5432:5432
