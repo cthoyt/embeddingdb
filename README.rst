@@ -55,7 +55,7 @@ Analyzing Entity Embeddings' Correlations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 One of the motivations for building this repository was to make a convenient way to
 compare the embeddings for entities generated through orthogonal embedding tecnhiques.
-For example, we wanted to to what extent the embeddings for proteins generated from
+For example, we wanted to know to what extent the embeddings for proteins generated from
 their sequences with ``ratvec`` contained the same information as the embeddings generated
 from protein-protein interaction networks with ``pykeen`` or ``nrl``.
 
