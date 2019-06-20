@@ -118,7 +118,7 @@ def main(fmt: str, path: str, connection: str):
             load_random(
                 session=session,
                 dimensions=12 * random.randint(3, 8),
-                tqdm_kwargs=dict(leave=False)
+                tqdm_kwargs=dict(leave=False),
             )
 
 
