@@ -15,8 +15,9 @@ problems--the code will get executed twice:
 Also see https://click.pocoo.org/latest/setuptools/
 """
 
-from typing import Optional
 import json
+from typing import Optional
+
 import click
 
 from embeddingdb.constants import config
@@ -51,11 +52,24 @@ def ls(limit: Optional[int], connection: str):
         )))
 
 
-main = click.Group(commands={
+commands = {
     'ls': ls,
     'analyze': analyze,
     'upload': upload,
-})
+}
 
-if __name__ == '__main__':
-    main()
+try:
+    from embeddingdb.web.wsgi import app
+
+
+    @click.command()
+    def web():
+        """Run the web application."""
+        app.run()
+
+
+    commands['web'] = web
+except ImportError:
+    pass
+
+main = click.Group(commands=commands)

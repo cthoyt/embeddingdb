@@ -31,6 +31,7 @@ _REGRESSIONS = {
     'elastic-cv': MultiTaskElasticNetCV,
     'lasso': MultiTaskLasso,
     'lasso-cv': MultiTaskLassoCV,
+    # 'svr': sklearn.svm.SVR,
 }
 
 
@@ -102,6 +103,7 @@ def main(id_1: int, id_2: int, model: Optional[str], output: Optional[BinaryIO],
         regression_cls=model,
         output=output,
     )
+    click.echo(f'Model: {clf}')
     click.echo(f'Dimensions: {clf.coef_.shape}')
     click.echo(f'R^2: {r2:.3f}')
 
