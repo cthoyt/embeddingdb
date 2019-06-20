@@ -17,6 +17,7 @@ from ..constants import config
 __all__ = [
     'load_pykeen',
     'load_word2vec',
+    'main',
 ]
 
 

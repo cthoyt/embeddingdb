@@ -20,6 +20,7 @@ from embeddingdb.sql.models import Collection, get_session
 
 __all__ = [
     'perform_regression',
+    'main',
 ]
 
 _REGRESSIONS = {
