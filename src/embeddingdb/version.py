@@ -4,6 +4,12 @@
 
 __all__ = [
     'VERSION',
+    'get_version',
 ]
 
 VERSION = '0.0.1-dev'
+
+
+def get_version() -> str:
+    """Get the current software version string."""
+    return VERSION
