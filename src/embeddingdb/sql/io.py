@@ -5,6 +5,7 @@
 import json
 import os
 import random
+import sys
 from typing import Any, Iterable, Mapping, Optional, Tuple, Union
 
 import click
@@ -30,6 +31,7 @@ def upload_word2vec(
         package_version: str,
         extras: Optional[Mapping[str, Any]] = None,
         session: Optional[Session] = None,
+        use_tqdm: bool = True,
 ) -> Collection:
     if session is None:
         session = get_session(config.connection)
@@ -44,7 +46,11 @@ def upload_word2vec(
         extras=extras,
     )
 
-    for curie, vector in model.wv.items():
+    it = model.wv.vocab
+    if use_tqdm:
+        it = tqdm(it, desc='Building SQLAlchemy models')
+    for curie in it:
+        vector = model.wv[curie]
         embedding = Embedding(
             collection=collection,
             curie=curie,
@@ -77,7 +83,7 @@ def upload_word2vec_embedding_file(
             package_version=package_version,
             extras=extras,
         )
-        for curie, *vector in tqdm(it, total=rows):
+        for curie, *vector in tqdm(it, total=rows, desc='Building SQLAlchemy models'):
             embedding = Embedding(
                 collection=collection,
                 curie=curie,
@@ -165,7 +171,7 @@ def load_random(
 
 
 @click.command()
-@click.option('-f', '--fmt', type=click.Choice(['keen', 'word2vec', 'random']))
+@click.option('-f', '--fmt', type=click.Choice(['keen', 'word2vec', 'word2vec-model', 'random']))
 @click.option('-p', '--path', type=click.Path(file_okay=True, dir_okay=True, exists=True))
 @click.option('-m', '--metadata', type=click.File())
 @config.get_connection_option()
@@ -173,27 +179,43 @@ def main(fmt: str, path: str, metadata, connection: str):
     """Upload embeddings."""
     session = get_session(connection=connection)
 
-    if fmt == 'word2vec':
+    if fmt in {'word2vec', 'word2vec-model'}:
         if not metadata:
             raise ValueError('Must give --metadata for word2vec')
         metadata = json.load(metadata)
-        upload_word2vec_embedding_file(
+
+        if fmt == 'word2vec-model':
+            upload_function = upload_word2vec
+        else:
+            upload_function = upload_word2vec_embedding_file
+
+        collection = upload_function(
+            path,
             session=session,
-            path=path,
             package_name=metadata.pop('package_name'),
             package_version=metadata.pop('package_version'),
             extras=metadata,
         )
+
+        click.echo(f'Uploaded collection {collection.id}')
+        return sys.exit(0)
+
     elif fmt == 'keen':
-        upload_pykeen_from_directory(directory=path, session=session)
+        collection = upload_pykeen_from_directory(directory=path, session=session)
+        click.echo(f'Uploaded collection {collection.id}')
+        return sys.exit(0)
+
     else:
         n_random = 5
-        for _ in trange(n_random, desc=f'Loading {n_random} random data sets'):
-            load_random(
+        it = trange(n_random, desc=f'Loading {n_random} random data sets')
+        for _ in it:
+            collection = load_random(
                 session=session,
                 dimensions=12 * random.randint(3, 8),
                 tqdm_kwargs=dict(leave=False),
             )
+            it.write(f'Uploaded collection {collection.id}')
+        return sys.exit(0)
 
 
 if __name__ == '__main__':

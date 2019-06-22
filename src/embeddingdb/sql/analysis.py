@@ -65,10 +65,13 @@ def perform_regression(
         raise TypeError(f'regression_cls had invalid type: {regression_cls}')
 
     clf = regression_cls(**(regression_kwargs or {}))
-    x = collection_1.as_ndarray()
-    y = collection_2.as_ndarray()
+    x = collection_1.as_dataframe()
+    y = collection_2.as_dataframe()
 
-    # TODO check if the entities are aligned. For now, assume they are
+    index = x.index & y.index
+    x = x.loc[index]
+    y = y.loc[index]
+
     clf.fit(x, y)
 
     if output is not None:
@@ -77,7 +80,7 @@ def perform_regression(
     y_pred = clf.predict(x)
     r2 = r2_score(y, y_pred)
 
-    return clf, r2
+    return clf, r2, len(index), len(index) / min(len(x.index), len(y.index))
 
 
 def _get_collection(session: Session, collection_id: int) -> Collection:
@@ -97,7 +100,7 @@ def main(id_1: int, id_2: int, model: Optional[str], output: Optional[BinaryIO],
     collection_1 = _get_collection(session, id_1)
     collection_2 = _get_collection(session, id_2)
 
-    clf, r2 = perform_regression(
+    clf, r2, intersect, intersect_percent = perform_regression(
         collection_1,
         collection_2,
         regression_cls=model,
@@ -106,6 +109,7 @@ def main(id_1: int, id_2: int, model: Optional[str], output: Optional[BinaryIO],
     click.echo(f'Model: {clf}')
     click.echo(f'Dimensions: {clf.coef_.shape}')
     click.echo(f'R^2: {r2:.3f}')
+    click.echo(f'Intersection: {intersect} ({intersect_percent:.1%})')
 
 
 if __name__ == '__main__':

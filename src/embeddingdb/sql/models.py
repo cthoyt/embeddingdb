@@ -55,10 +55,13 @@ class Collection(Base):
 
     def as_dataframe(self) -> pd.DataFrame:
         """Get this collection as a pandas DataFrame."""
-        return pd.DataFrame({
-            embedding.curie: embedding.vector
-            for embedding in self.embeddings.order_by(Embedding.curie)
-        })
+        return pd.DataFrame.from_dict(
+            {
+                embedding.curie: embedding.vector
+                for embedding in self.embeddings.order_by(Embedding.curie)
+            },
+            orient='index',
+        )
 
 
 class Embedding(Base):
