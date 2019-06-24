@@ -34,7 +34,7 @@ def upload_word2vec(
         use_tqdm: bool = True,
 ) -> Collection:
     if session is None:
-        session = get_session(config.connection)
+        session = get_session()
 
     if isinstance(model, str):
         model = Word2Vec.load(model)
@@ -72,7 +72,7 @@ def upload_word2vec_embedding_file(
 ) -> Collection:
     """Load a word2vec file into the database."""
     if session is None:
-        session = get_session(config.connection)
+        session = get_session()
 
     with open(path) as file:
         it = _spliterate(file)
@@ -107,7 +107,7 @@ def upload_pykeen_from_directory(
 ) -> Collection:
     """Load a PyKEEN output into the database."""
     if session is None:
-        session = get_session(config.connection)
+        session = get_session()
 
     config_path = os.path.join(directory, 'configuration.json')
     with open(config_path) as file:
@@ -144,7 +144,7 @@ def load_random(
         tqdm_kwargs: Optional[Mapping[str, Any]] = None,
 ) -> Collection:
     if session is None:
-        session = get_session(config.connection)
+        session = get_session()
 
     lamb = random.randint(1, 5)
     dimensions = dimensions if dimensions is not None else 12 * random.randint(3, 8)

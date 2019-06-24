@@ -2,11 +2,15 @@
 
 """SQLAlchemy models for storing embeddings."""
 
+from typing import Optional
+
 import numpy as np
 import pandas as pd
 from sqlalchemy import ARRAY, Column, Float, ForeignKey, Integer, JSON, String, UniqueConstraint, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import Session, backref, relationship, scoped_session, sessionmaker
+
+from ..constants import config
 
 __all__ = [
     'Base',
@@ -18,8 +22,10 @@ __all__ = [
 Base = declarative_base()
 
 
-def get_session(connection: str) -> Session:
+def get_session(connection: Optional[str] = None) -> Session:
     """Get a scoped session at the given connection."""
+    if connection is None:
+        connection = config.connection
     engine = create_engine(connection)
     Base.metadata.create_all(bind=engine, checkfirst=True)
     session_maker = sessionmaker(bind=engine)
