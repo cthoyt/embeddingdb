@@ -1,5 +1,5 @@
-Embedding Database
-==================
+Embedding Database |zenodo|
+===========================
 This package provides a database schema and Python wrapper
 for storing the embeddings generated through various representation
 learning packages.
@@ -9,11 +9,26 @@ but might be extended to use a NoSQL database as an alternative.
 
 Installation
 ------------
-Install ``embeddingdb`` directly from GitHub with:
+Install ``embeddingdb`` from `PyPI <https://pypi.org/project/embeddingdb/>`_ with:
+
+.. code-block:: sh
+
+   $ pip install embeddingdb
+
+Alternatively, install the latest development version of ``embeddingdb`` directly
+from GitHub with:
 
 .. code-block:: sh
 
    $ pip install git+https://github.com/cthoyt/embeddingdb
+
+For developers, install ``embeddingdb`` in development mode from GitHub with:
+
+.. code-block:: sh
+
+   $ git clone https://github.com/cthoyt/embeddingdb.git
+   $ cd embeddingdb
+   $ pip install -e .
 
 Set the environment variable ``EMBEDDINGDB_CONNECTION`` to a valid
 SQLAlchemy connection string for a PostgreSQL instance, as this package uses
@@ -74,3 +89,6 @@ After installing Docker, the entire web application can be instantiated with:
    $ docker-compose up
 
 Get the endpoint ``/test`` to instantiate the database and add a test collection.
+
+.. |zenodo| image:: https://zenodo.org/badge/192898201.svg
+   :target: https://zenodo.org/badge/latestdoi/192898201
